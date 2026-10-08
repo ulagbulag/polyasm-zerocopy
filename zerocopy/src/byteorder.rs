@@ -145,14 +145,14 @@ impl Display for LittleEndian {
 ///
 /// This is a type alias for [`BigEndian`] or [`LittleEndian`] depending on the
 /// endianness of the target platform.
-#[cfg(target_endian = "big")]
+#[cfg(all(not(target_abi = "polyasm"), target_endian = "big"))]
 pub type NativeEndian = BigEndian;
 
 /// The endianness used by this platform.
 ///
 /// This is a type alias for [`BigEndian`] or [`LittleEndian`] depending on the
 /// endianness of the target platform.
-#[cfg(target_endian = "little")]
+#[cfg(all(not(target_abi = "polyasm"), target_endian = "little"))]
 pub type NativeEndian = LittleEndian;
 
 /// The endianness used in many network protocols.
@@ -1004,6 +1004,9 @@ macro_rules! module {
 module!(big_endian, BigEndian, "big-endian");
 module!(little_endian, LittleEndian, "little-endian");
 module!(network_endian, NetworkEndian, "network-endian");
+// PolyASM publishes no native byte order, so it has no native-endian module;
+// name `big_endian` or `little_endian` there instead.
+#[cfg(any(target_endian = "big", target_endian = "little"))]
 module!(native_endian, NativeEndian, "native-endian");
 
 #[cfg(any(test, kani))]

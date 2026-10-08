@@ -1255,11 +1255,14 @@ macro_rules! cryptocorrosion_derive_traits {
 
 #[cfg(test)]
 mod tests {
-    use crate::{
-        byteorder::native_endian::{U16, U32},
-        util::testutil::*,
-        *,
-    };
+    // `native_endian` covers big- and little-endian targets; on PolyASM this
+    // module takes little-endian, since it needs a multi-byte integer type of
+    // any order.
+    #[cfg(not(any(target_endian = "big", target_endian = "little")))]
+    use crate::byteorder::little_endian::{U16, U32};
+    #[cfg(any(target_endian = "big", target_endian = "little"))]
+    use crate::byteorder::native_endian::{U16, U32};
+    use crate::{util::testutil::*, *};
 
     #[derive(KnownLayout, Immutable, FromBytes, IntoBytes, PartialEq, Debug)]
     #[repr(C)]
